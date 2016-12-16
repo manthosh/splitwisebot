@@ -22,28 +22,45 @@ app.get('/', (req, res) => {
 
 
 var userOAuthToken, userOAuthTokenSecret;
+var authApi;
 app.get('/requestAccess', (req, res) => {
-	var authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
+	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
 	var userAuthUrl = authApi.getOAuthRequestToken()
     							.then(({ token, secret }) => {
         								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
         								return authApi.getUserAuthorisationUrl(token);
     								});
-	userAuthUrl.then(({uri}) => {
-		var body = "Click <a href='"+userAuthUrl+"'>here</a> to authenticate.";						
+	userAuthUrl.then((uri) => {
+		var body = "Click <a href='"+uri+"'>here</a> to authenticate.";						
 	    res.writeHead(200, {
 	                    'Content-Length': body.length,
 	                    'Content-Type': 'text/html' });
-	    console.log("Manthosh");
-	    console.log(userAuthUrl);
+	    // console.log("Manthosh");
+	    // console.log(uri);
 	    return res.end(body);
 	});    							
 })
 
-app.get('/test', (req, res) => {
+var intervalTimeoutObj;
+app.get('/start', (req, res) => {
 	var splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
 	console.log(splitwiseApi);
-    return res.end("<h1>Ok</h1>");
+
+	// intervalTimeoutObj = setInterval(() => {
+		var vaishnavi = splitwiseApi.getFriends();
+		vaishnavi.then((friendRes) => {
+			console.log("Manthosh");
+			console.log(friendRes);
+			return res.end(friendRes);
+		});
+	// }, 10000);
+
+    
+})
+
+app.get('/stop', (req, res) => {
+	clearInterval(intervalTimeoutObj);
+    return res.end("<h1>Stopped</h1>");
 })
 
 // var getRequestToken = function(req, res) {
