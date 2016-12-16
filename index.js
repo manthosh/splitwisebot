@@ -27,6 +27,7 @@ app.get('/requestAccess', (req, res) => {
 	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
 	var userAuthUrl = authApi.getOAuthRequestToken()
     							.then(({ token, secret }) => {
+
         								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
         								return authApi.getUserAuthorisationUrl(token);
     								});
@@ -39,6 +40,20 @@ app.get('/requestAccess', (req, res) => {
 	    // console.log(uri);
 	    return res.end(body);
 	});    							
+})
+
+app.get('/callback', (req, res) => {
+	console.log("verifier");
+	console.log(req.query.oauth_verifier);
+	authApi.getOAuthRequestToken()
+			.then(({ token, secret }) => {
+				[userOAuthToken, userOAuthTokenSecret] = [token, secret];
+				console.log("secrets");
+				console.log(userOAuthToken);
+				console.log(userOAuthTokenSecret);
+			});				
+
+    return res.end("<h1>Hello World</h1>");
 })
 
 var intervalTimeoutObj;
