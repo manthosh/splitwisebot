@@ -51,9 +51,8 @@ app.get('/callback', (req, res) => {
 				console.log("secrets");
 				console.log(userOAuthToken);
 				console.log(userOAuthTokenSecret);
+				return res.end("<h1>Magizhchi</h1>");
 			});				
-
-    return res.end("<h1>Hello World</h1>");
 })
 
 var intervalTimeoutObj;
@@ -62,14 +61,19 @@ app.get('/start', (req, res) => {
 	console.log(splitwiseApi);
 
 	// intervalTimeoutObj = setInterval(() => {
-		var vaishnavi = splitwiseApi.getFriends();
-		vaishnavi.then((friendRes) => {
-			console.log("Manthosh");
-			console.log(friendRes);
-			return res.end(friendRes);
+		// var vaishnavi = splitwiseApi.getFriend('2635429');
+		// console.log(vaishnavi);
+		// vaishnavi.then((friendRes) => {
+		// 	console.log("Manthosh");
+		// 	console.log(friendRes);
+		// 	return res.end(friendRes);
+		// });
+		splitwiseApi.__auth.get('https://secure.splitwise.com/api/v3.0/get_friend/2635429', splitwiseApi.oAuthToken, splitwiseApi.oAuthTokenSecret, function(response) {
+			console.log(response);
+			return res.end("<h1>"+response+"</h1>");
 		});
 	// }, 10000);
-
+		
     
 })
 
