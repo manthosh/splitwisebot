@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 // const OAuth = require('../lib/oauth.js').OAuth;
 const AuthAPI = require('splitwise-node');
-const Nightmare = require('nightmare');
+const Horseman = require('node-horseman');
 
 let app = express();
 
@@ -17,16 +17,18 @@ let app = express();
 // 		'HMAC-SHA1'
 // 	);
 
+let horseman = new Horseman();
 var loginAction = function(actionCB) {
-	var splitLogin = new Nightmare()
-							.goto('https://www.splitwise.com/login')
-							.wait()
-							.type('#user_session_email', 'manthosh@gmail.com')
-							.type('#user_session_password', 'tvrM1991')
-							.click('.btn.btn-orange.btn-large.primary')
-							.wait()
-							.run(actionCB);
-
+	horseman
+	  .userAgent('Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0')
+	  .open('https://www.splitwise.com')
+	  .click('.btn.btn-mint')
+	  .type('#user_session_email', 'manthosh@gmail.com')
+	  .type('#user_session_password', 'tvrM1991')
+	  .click('input[type=submit]')
+	  .waitForSelector('.dropdown-toggle')
+	  .do(actionCB)
+	  .close();
 }
 
 var userOAuthToken, userOAuthTokenSecret;
@@ -42,14 +44,11 @@ var init = function() {
     								return authApi.getUserAuthorisationUrl(token);
 								});
 	userAuthUrl.then((uri) => {
-		loginAction(function(err, nightmare) {
-			if (err) return console.log(err);
+		loginAction(function() {
       		console.log('Done!');
-      		var authorizeApp = new Nightmare()
-      							.goto(uri)
-      							.wait()
-      							.click('.large.btn.primary')
-      							.wait();
+      		horseman.openTab(uri)
+      				.click('input[value=Authorize]')
+      				.waitForNextPage();
 		});
 	}); 						
 }
