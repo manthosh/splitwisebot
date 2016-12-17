@@ -55,9 +55,11 @@ app.get('/callback', (req, res) => {
 			});				
 })
 
-var intervalTimeoutObj;
+var intervalTimeoutObj, splitwiseApi = null;
 app.get('/start', (req, res) => {
-	var splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
+	if(splitwiseApi == null) {
+		splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
+	}
 	console.log(splitwiseApi);
 
 	// intervalTimeoutObj = setInterval(() => {
@@ -80,6 +82,16 @@ app.get('/start', (req, res) => {
 app.get('/stop', (req, res) => {
 	clearInterval(intervalTimeoutObj);
     return res.end("<h1>Stopped</h1>");
+})
+
+app.get('/status', (req, res) => {
+	if(splitwiseApi == null) {
+		splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
+	}
+	splitwiseApi.isServiceOk().then((status) => {
+		return res.end("<h1>"+status+"</h1>");	
+	});
+    
 })
 
 // var getRequestToken = function(req, res) {
