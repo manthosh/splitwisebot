@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 // const OAuth = require('../lib/oauth.js').OAuth;
 const AuthAPI = require('splitwise-node');
+const Nightmare = require('nightmare');
 
 let app = express();
 
@@ -16,13 +17,51 @@ let app = express();
 // 		'HMAC-SHA1'
 // 	);
 
+var loginAction = function(actionCB) {
+	var splitLogin = new Nightmare()
+							.goto('https://www.splitwise.com/login')
+							.wait()
+							.type('#user_session_email', 'manthosh@gmail.com')
+							.type('#user_session_password', 'tvrM1991')
+							.click('.btn.btn-orange.btn-large.primary')
+							.wait()
+							.run(actionCB);
+
+}
+
+var userOAuthToken, userOAuthTokenSecret;
+var authApi;
+
+var init = function() {
+	console.log('Check');
+	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
+	var userAuthUrl = authApi.getOAuthRequestToken()
+							.then(({ token, secret }) => {
+
+    								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
+    								return authApi.getUserAuthorisationUrl(token);
+								});
+	userAuthUrl.then((uri) => {
+		loginAction(function(err, nightmare) {
+			if (err) return console.log(err);
+      		console.log('Done!');
+      		var authorizeApp = new Nightmare()
+      							.goto(uri)
+      							.wait()
+      							.click('.large.btn.primary')
+      							.wait();
+		});
+	}); 						
+}
+
+init();
+
 app.get('/', (req, res) => {
     return res.end("<h1>Hello World</h1>");
 })
 
 
-var userOAuthToken, userOAuthTokenSecret;
-var authApi;
+
 app.get('/requestAccess', (req, res) => {
 	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
 	var userAuthUrl = authApi.getOAuthRequestToken()
@@ -57,23 +96,10 @@ app.get('/callback', (req, res) => {
 
 var intervalTimeoutObj, splitwiseApi = null;
 app.get('/start', (req, res) => {
-	if(splitwiseApi == null) {
-		splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
-	}
-	console.log(splitwiseApi);
-
+	
+	login();
 	// intervalTimeoutObj = setInterval(() => {
-		// var vaishnavi = splitwiseApi.getFriend('2635429');
-		// console.log(vaishnavi);
-		// vaishnavi.then((friendRes) => {
-		// 	console.log("Manthosh");
-		// 	console.log(friendRes);
-		// 	return res.end(friendRes);
-		// });
-		splitwiseApi.__auth.get('https://secure.splitwise.com/api/v3.0/get_friend/2635429', splitwiseApi.oAuthToken, splitwiseApi.oAuthTokenSecret, function(response) {
-			console.log(response);
-			return res.end("<h1>"+response+"</h1>");
-		});
+		
 	// }, 10000);
 		
     
