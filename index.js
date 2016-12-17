@@ -26,31 +26,37 @@ var loginAction = function(actionCB) {
 	  .type('#user_session_email', 'manthosh@gmail.com')
 	  .type('#user_session_password', 'tvrM1991')
 	  .click('input[type=submit]')
-	  .waitForSelector('.dropdown-toggle')
-	  .do(actionCB)
-	  .close();
+	  .wait(10000)
+	  .log();
+	  // .do(actionCB)
+	  // .close();
 }
 
 var userOAuthToken, userOAuthTokenSecret;
 var authApi;
 
 var init = function() {
-	console.log('Check');
-	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
-	var userAuthUrl = authApi.getOAuthRequestToken()
-							.then(({ token, secret }) => {
+	try {
+		// console.log('Init');
+		// authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
+		// var userAuthUrl = authApi.getOAuthRequestToken()
+		// 						.then(({ token, secret }) => {
 
-    								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
-    								return authApi.getUserAuthorisationUrl(token);
-								});
-	userAuthUrl.then((uri) => {
-		loginAction(function() {
-      		console.log('Done!');
-      		horseman.openTab(uri)
-      				.click('input[value=Authorize]')
-      				.waitForNextPage();
-		});
-	}); 						
+	 //    								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
+	 //    								return authApi.getUserAuthorisationUrl(token);
+		// 							});
+		// userAuthUrl.then((uri) => {
+		// 	loginAction(function() {
+	 //      		horseman.openTab(uri)
+	 //      				.click('input[value=Authorize]')
+	 //      				.wait(10000);
+		// 	});
+		// }); 
+		loginAction();
+	}
+	catch(err) {
+		setTimeout(init,2000);
+	}						
 }
 
 init();
@@ -62,22 +68,8 @@ app.get('/', (req, res) => {
 
 
 app.get('/requestAccess', (req, res) => {
-	authApi = new AuthAPI(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
-	var userAuthUrl = authApi.getOAuthRequestToken()
-    							.then(({ token, secret }) => {
-
-        								[userOAuthToken, userOAuthTokenSecret] = [token, secret];
-        								return authApi.getUserAuthorisationUrl(token);
-    								});
-	userAuthUrl.then((uri) => {
-		var body = "Click <a href='"+uri+"'>here</a> to authenticate.";						
-	    res.writeHead(200, {
-	                    'Content-Length': body.length,
-	                    'Content-Type': 'text/html' });
-	    // console.log("Manthosh");
-	    // console.log(uri);
-	    return res.end(body);
-	});    							
+	init();
+	res.end("Done!!");   							
 })
 
 app.get('/callback', (req, res) => {
@@ -95,13 +87,58 @@ app.get('/callback', (req, res) => {
 
 var intervalTimeoutObj, splitwiseApi = null;
 app.get('/start', (req, res) => {
-	
-	login();
-	// intervalTimeoutObj = setInterval(() => {
-		
-	// }, 10000);
-		
-    
+
+	// horseman.do(function() {
+	// loginAction(function() {	
+	// 	if(splitwiseApi == null) {
+	// 		splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
+	// 	}
+	// 	console.log(splitwiseApi);
+
+	// 	splitwiseApi.getFriends().then((friendRes) => {
+	// 								console.log("Manthosh");
+	// 								console.log(friendRes);
+	// 							});
+
+	// 	splitwiseApi.__auth.get('https://secure.splitwise.com/api/v3.0/get_friend/2635429', splitwiseApi.oAuthToken, splitwiseApi.oAuthTokenSecret, function(response) {
+	// 								console.log(response);
+	// 								//return res.end("<h1>"+JSON.stringify(response)+"</h1>");
+	// 							});
+	// });	
+
+	// if(splitwiseApi == null) {
+	// 	splitwiseApi = authApi.getSplitwiseApi(userOAuthToken, userOAuthTokenSecret);
+	// }
+
+	// horseman.open('https://www.splitwise.com')
+	// 		.wait(10000)
+	// 		.evaluate(function(splitwiseApi) {
+				
+	// 				console.log(splitwiseApi);
+
+	// 				splitwiseApi.getFriends().then((friendRes) => {
+	// 											console.log("Manthosh");
+	// 											console.log(friendRes);
+	// 										});
+
+	// 				splitwiseApi.__auth.get('https://secure.splitwise.com/api/v3.0/get_friend/2635429', splitwiseApi.oAuthToken, splitwiseApi.oAuthTokenSecret, function(response) {
+	// 											console.log(response);
+	// 											//return res.end("<h1>"+JSON.stringify(response)+"</h1>");
+	// 										});
+	// 		}, splitwiseApi)
+	// 		 .close();
+
+	horseman.userAgent('Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0')
+			.open('https://secure.splitwise.com/api/v3.0/get_friend/2635429')
+			.waitForSelector('pre')
+			.html('pre')
+			.then(function(response) {
+				console.log(response);
+				return res.end("<h1>"+JSON.stringify(response)+"</h1>")
+			})
+			.close();
+
+    // return res.end("<h1>Started</h1>");	
 })
 
 app.get('/stop', (req, res) => {
