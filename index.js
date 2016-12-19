@@ -15,7 +15,7 @@ var loginAction = function() {
 	  .type('#user_session_email', 'manthosh@gmail.com')
 	  .type('#user_session_password', 'tvrM1991')
 	  .click('input[type=submit]')
-	  .wait(10000)
+	  .waitForSelector('.dropdown-toggle')
 	  .text('.dropdown-toggle')
 	  .then((text) => {
 	            console.log(text);
@@ -53,7 +53,6 @@ var data = [];
 var fetchBalance = function() {
 		isRunning = true;
 		var response = getFriend(friendIDToBePolled);
-		// var response = getFriend(238606);
 		response.then((friend) => {
 			// console.log("Manthosh");
 			// console.log(friend);
@@ -151,4 +150,4 @@ app.get('/status', (req, res) => {
 	res.end(body);
 })
 
-http.createServer(app).listen(process.env.PORT || 3000)
+http.createServer(app).listen(process.env.PORT || 30165)
