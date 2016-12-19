@@ -48,6 +48,8 @@ var addExpense = function(firstName, amount) {
 var isRunning = false;
 var previousBalance = 38.98;
 var friendIDToBePolled = 2635429;
+var data = [];
+
 var fetchBalance = function() {
 		isRunning = true;
 		var response = getFriend(friendIDToBePolled);
@@ -66,6 +68,11 @@ var fetchBalance = function() {
 					var balance = parseFloat(friend.friend.balance[0].amount);
 
 					console.log(firstName+"=>"+balance);
+
+					if(data.length == 10) {
+						data.splice(0, 1);
+					}
+					data.push([firstName, balance]);
 
 					if(balance == 0) {
 						addExpense(firstName, previousBalance);
@@ -125,6 +132,22 @@ app.get('/changeid/:friendid', (req, res) => {
 				return res.end("<h1>Changed the ID from "+currentID+" to "+friendIDToBePolled+"</h1>");
 			}
 		}
+})
+
+app.get('/status', (req, res) => {
+	var body = "<table><thead><tr><td>Name</td><td>Balance</td></tr></thead><tbody>";
+
+	for(var i=data.length-1;i>-1;i--) {
+		var color = data[i][1] == 0?"rgb(191, 114, 136)":"rgb(125, 191, 114)";
+		body += "<tr style='background-color:"+color+"'><td>"+data[i][0]+"</td><td>"+data[i][1]+"</td></tr>";
+	}
+
+	body += "</tbody></table>";
+
+    res.writeHead(200, {
+		'Content-Length': body.length,
+		'Content-Type': 'text/html' });
+	res.end(body);
 })
 
 http.createServer(app).listen(process.env.PORT || 3000)
