@@ -46,7 +46,7 @@ var addExpense = function(firstName, amount) {
 }
 
 var isRunning = false;
-var previousBalance = 0;
+var previousBalance = 38.98;
 var friendIDToBePolled = 2635429;
 var fetchBalance = function() {
 		isRunning = true;
@@ -70,7 +70,9 @@ var fetchBalance = function() {
 					if(balance == 0) {
 						addExpense(firstName, previousBalance);
 					}
-					previousBalance = balance;
+					else {
+						previousBalance = balance;
+					}
 				}
 			}
 
@@ -106,6 +108,10 @@ app.get('/stop', (req, res) => {
 	}
 })
 
+app.get('/currentid', (req, res) => {
+	return res.end("<h1>Current ID : "+friendIDToBePolled+"</h1>");
+})
+
 app.get('/changeid/:friendid', (req, res) => {
 		var currentID = friendIDToBePolled;
 		var newID = req.params.friendid;
@@ -118,9 +124,6 @@ app.get('/changeid/:friendid', (req, res) => {
 				friendIDToBePolled = parseInt(newID);
 				return res.end("<h1>Changed the ID from "+currentID+" to "+friendIDToBePolled+"</h1>");
 			}
-		}
-		else {
-			return res.end("<h1>Current ID : "+currentID+"</h1>");
 		}
 })
 
