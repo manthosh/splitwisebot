@@ -75,7 +75,8 @@ var fetchBalance = function() {
 					data.push([firstName, balance]);
 
 					if(balance == 0) {
-						addExpense(firstName, previousBalance);
+						addExpense(firstName, 38.98);
+						// addExpense(firstName, previousBalance);
 					}
 					else {
 						previousBalance = balance;
