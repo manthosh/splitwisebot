@@ -47,9 +47,10 @@ var addExpense = function(firstName, amount) {
 
 var isRunning = false;
 var previousBalance = 0;
+var friendIDToBePolled = 2635429;
 var fetchBalance = function() {
 		isRunning = true;
-		var response = getFriend(2635429);
+		var response = getFriend(friendIDToBePolled);
 		// var response = getFriend(238606);
 		response.then((friend) => {
 			// console.log("Manthosh");
@@ -105,8 +106,22 @@ app.get('/stop', (req, res) => {
 	}
 })
 
-app.get('/status', (req, res) => {
-	
+app.get('/changeid/:friendid', (req, res) => {
+		var currentID = friendIDToBePolled;
+		var newID = req.params.friendid;
+
+		if(newID) {
+			if(isNaN(newID)) {
+				return res.end("<h1>Give a valid FriendID. So using the existing ID : "+currentID+"</h1>");
+			}
+			else {
+				friendIDToBePolled = parseInt(newID);
+				return res.end("<h1>Changed the ID from "+currentID+" to "+friendIDToBePolled+"</h1>");
+			}
+		}
+		else {
+			return res.end("<h1>Current ID : "+currentID+"</h1>");
+		}
 })
 
 http.createServer(app).listen(process.env.PORT || 3000)
