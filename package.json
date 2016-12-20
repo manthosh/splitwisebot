@@ -1,5 +1,5 @@
 {
-  "name": "test-splitwise",
+  "name": "splitwise-bot",
   "version": "1.0.0",
   "description": "Testing splitwise API",
   "main": "index.js",
@@ -7,6 +7,21 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "Manthosh",
-  "license": "ISC"
+  "author": "Manthosh Kumar",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "node-horseman": "^3.2.0",
+    "phantomjs-prebuilt": "^2.1.14",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manthosh/splitwisebot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/manthosh/splitwisebot/issues"
+  },
+  "homepage": "https://github.com/manthosh/splitwisebot#readme"
 }
