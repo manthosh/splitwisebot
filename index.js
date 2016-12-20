@@ -71,7 +71,7 @@ var fetchBalance = function() {
 					if(data.length == 10) {
 						data.splice(0, 1);
 					}
-					data.push([firstName, balance]);
+					data.push([firstName, balance, Date.now()]);
 
 					if(balance == 0) {
 						addExpense(firstName, 38.98);
@@ -135,11 +135,11 @@ app.get('/changeid/:friendid', (req, res) => {
 })
 
 app.get('/status', (req, res) => {
-	var body = "<table><thead><tr><td>Name</td><td>Balance</td></tr></thead><tbody>";
+	var body = "<table><thead><tr><td>Name</td><td>Balance</td><td>Time</td></tr></thead><tbody>";
 
 	for(var i=data.length-1;i>-1;i--) {
 		var color = data[i][1] == 0?"rgb(191, 114, 136)":"rgb(125, 191, 114)";
-		body += "<tr style='background-color:"+color+"'><td>"+data[i][0]+"</td><td>"+data[i][1]+"</td></tr>";
+		body += "<tr style='background-color:"+color+"'><td>"+data[i][0]+"</td><td>"+data[i][1]+"</td><td><script>document.write(new Date("+data[i][2]+"))</script></td></tr>";
 	}
 
 	body += "</tbody></table>";
